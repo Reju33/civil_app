@@ -1,32 +1,55 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface RealtimeLocation {
-  userId: string;
-  latitude: number;
-  longitude: number;
-  timestamp: number;
+interface LocationState {
+  currentLocation: {
+    latitude: number;
+    longitude: number;
+    latitudeDelta?: number;
+    longitudeDelta?: number;
+  } | null;
+  searchLocation: {
+    latitude: number;
+    longitude: number;
+    description: string;
+  } | null;
+  otherUserLocation: Record<string, {
+    latitude: number;
+    longitude: number;
+  }>;
 }
 
-interface RealtimeLocationState {
-  locations: Record<string, RealtimeLocation>;
-}
-
-const initialState: RealtimeLocationState = {
-  locations: {},
+const initialState: LocationState = {
+  currentLocation: null,
+  searchLocation: null,
+  otherUserLocation: {},
 };
 
-const realtimeLocationSlice = createSlice({
-  name: 'realtimeLocation',
+const locationSlice = createSlice({
+  name: 'location',
   initialState,
   reducers: {
-    setLocation: (state, action: PayloadAction<RealtimeLocation>) => {
-      state.locations[action.payload.userId] = action.payload;
+    setCurrentLocation: (state, action: PayloadAction<{ latitude: number; longitude: number }>) => {
+      state.currentLocation = {
+        ...action.payload,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421
+      };
     },
-    removeLocation: (state, action: PayloadAction<string>) => {
-      delete state.locations[action.payload];
+    setSearchLocation: (state, action: PayloadAction<{ latitude: number; longitude: number; description: string }>) => {
+      state.searchLocation = action.payload;
+    },
+    setLocation: (state, action: PayloadAction<{ latitude: number; longitude: number }>) => {
+      state.currentLocation = {
+        ...action.payload,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421
+      };
+    },
+    setOtherUserLocation: (state, action: PayloadAction<Record<string, { latitude: number; longitude: number }>>) => {
+      state.otherUserLocation = action.payload;
     },
   },
 });
 
-export const { setLocation, removeLocation } = realtimeLocationSlice.actions;
-export default realtimeLocationSlice.reducer;
+export const { setCurrentLocation, setSearchLocation, setLocation, setOtherUserLocation } = locationSlice.actions;
+export default locationSlice.reducer;

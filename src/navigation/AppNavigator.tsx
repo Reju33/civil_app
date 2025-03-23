@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
 import AuthScreen from '../screens/AuthScreen';
 import { useSelector } from 'react-redux';
+import { RootState } from '../store/slices/store';
+
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -31,4 +33,5 @@ const AppNavigator = () => {
     </NavigationContainer>
   );
 };
+
 export default AppNavigator;
