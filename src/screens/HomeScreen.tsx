@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Platform, Alert, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Platform, Alert, StyleSheet, Text } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import * as Location from 'expo-location';
@@ -8,13 +8,16 @@ import { RootState } from '../store/store';
 import { setCurrentLocation, setSearchLocation } from '../store/slices/locationSlice';
 import { GOOGLE_PLACES_API_KEY } from '@env';
 import { styled } from 'nativewind';
+import { Image } from "react-native";
 
+const customIcon = require("../../assets/casco.png");
 const StyledView = styled(View);
 
 const HomeScreen: React.FC = () => {
   const dispatch = useDispatch();
   const { currentLocation, searchLocation } = useSelector((state: RootState) => state.location);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
     (async () => {
@@ -44,6 +47,16 @@ const HomeScreen: React.FC = () => {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
         }));
+
+        // Centrar el mapa en la ubicación actual
+        if (mapRef.current) {
+          mapRef.current.animateToRegion({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }, 1000);
+        }
       } catch (error) {
         setErrorMsg('Error getting location');
         console.error('Location error:', error);
@@ -105,6 +118,7 @@ const HomeScreen: React.FC = () => {
         />
       </StyledView>
       <MapView
+        ref={mapRef}
         provider={PROVIDER_GOOGLE}
         style={{ flex: 1 }}
         initialRegion={initialRegion}
@@ -119,8 +133,11 @@ const HomeScreen: React.FC = () => {
               longitude: currentLocation.longitude,
             }}
             title="Current Location"
+            description="aaaaa"
             pinColor="blue"
-          />
+          >
+            <Image source={customIcon} style={{ width: 30, height: 30 }} />
+          </Marker>
         )}
         {searchLocation && (
           <Marker
@@ -130,7 +147,9 @@ const HomeScreen: React.FC = () => {
             }}
             title={searchLocation.description || "Search Location"}
             pinColor="green"
-          />
+          >
+            <Image source={customIcon} style={{ width: 30, height: 30 }} />
+          </Marker>
         )}
       </MapView>
     </StyledView>
