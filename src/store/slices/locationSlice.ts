@@ -1,33 +1,32 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface Location {
+interface RealtimeLocation {
+  userId: string;
   latitude: number;
   longitude: number;
-  description?: string;
+  timestamp: number;
 }
 
-interface LocationState {
-  currentLocation: Location | null;
-  searchLocation: Location | null;
+interface RealtimeLocationState {
+  locations: Record<string, RealtimeLocation>;
 }
 
-const initialState: LocationState = {
-  currentLocation: null,
-  searchLocation: null,
+const initialState: RealtimeLocationState = {
+  locations: {},
 };
 
-const locationSlice = createSlice({
-  name: 'location',
+const realtimeLocationSlice = createSlice({
+  name: 'realtimeLocation',
   initialState,
   reducers: {
-    setCurrentLocation: (state, action: PayloadAction<Location>) => {
-      state.currentLocation = action.payload;
+    setLocation: (state, action: PayloadAction<RealtimeLocation>) => {
+      state.locations[action.payload.userId] = action.payload;
     },
-    setSearchLocation: (state, action: PayloadAction<Location>) => {
-      state.searchLocation = action.payload;
+    removeLocation: (state, action: PayloadAction<string>) => {
+      delete state.locations[action.payload];
     },
   },
 });
 
-export const { setCurrentLocation, setSearchLocation } = locationSlice.actions;
-export default locationSlice.reducer;
+export const { setLocation, removeLocation } = realtimeLocationSlice.actions;
+export default realtimeLocationSlice.reducer;
