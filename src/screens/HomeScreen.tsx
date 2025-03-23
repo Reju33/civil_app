@@ -14,7 +14,7 @@ import { auth } from '../config/firebase';
 import { ref, onValue, set, remove } from 'firebase/database';
 import { realtimeDb } from '../config/firebase';
 
-const customIcon = require("../../assets/casco.png");
+const customIcon = require("../../assets/casco2.png");
 const StyledView = styled(View);
 
 const styles = StyleSheet.create({
@@ -31,12 +31,25 @@ const styles = StyleSheet.create({
     right: 20,
     zIndex: 1,
   },
+  marker: {
+    width: 5,
+    height: 5,
+  },
 });
 
 const HomeScreen = () => {
   const dispatch = useDispatch();
   const { currentLocation, searchLocation, otherUserLocation } = useSelector((state: RootState) => state.location);
   const mapRef = useRef<MapView>(null);
+  
+  // Estado para el tamaño del marcador
+  const [markerSize, setMarkerSize] = useState(25);
+
+  // Función para calcular el tamaño del marcador
+  const getMarkerSize = (region: any) => {
+    // Tamaño fijo de 15px para todos los marcadores
+    return 15;
+  };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -109,14 +122,6 @@ const HomeScreen = () => {
     return () => unsubscribe();
   }, [dispatch]);
 
-  // Configuración inicial del mapa con deltas
-  const initialRegion = {
-    latitude: 19.4326, // Ciudad de México
-    longitude: -99.1332,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-  };
-
   // Función para obtener la región actual
   const getCurrentRegion = () => {
     if (currentLocation) {
@@ -125,8 +130,16 @@ const HomeScreen = () => {
     return initialRegion;
   };
 
+  // Configuración inicial del mapa con deltas
+  const initialRegion = {
+    latitude: 19.4326, // Ciudad de México
+    longitude: -99.1332,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  };
+
   return (
-    <StyledView className="flex-1">
+    <View style={styles.container}>
       <MapView
         ref={mapRef}
         provider={PROVIDER_GOOGLE}
@@ -142,8 +155,9 @@ const HomeScreen = () => {
         {currentLocation && (
           <Marker
             coordinate={currentLocation}
-            title="Mi ubicación"
+            title="Mi ubicación 3"
             image={customIcon}
+            style={styles.marker}
           />
         )}
 
@@ -154,11 +168,11 @@ const HomeScreen = () => {
             coordinate={location}
             title="Otro usuario"
             image={customIcon}
+            style={{ width: 15, height: 15 }}
           />
         ))}
       </MapView>
-    </StyledView>
+    </View>
   );
 };
-
 export default HomeScreen;
